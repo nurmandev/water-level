@@ -11,6 +11,8 @@ app.get('/endpoint', (req, res) => {
     res.json({ distance });
 });
 
+
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
