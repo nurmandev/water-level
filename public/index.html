@@ -500,6 +500,7 @@
       </div>
     </footer>
 
+    <!-- NEW CODE  -->
     <!-- Scripts -->
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -518,6 +519,86 @@
           toggle.parentElement.classList.toggle("active");
         });
       });
+    </script>
+
+    <!-- MAIN CODE -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      let historyData = {
+        labels: [],
+        datasets: [
+          {
+            label: "Distance (cm)",
+            data: [],
+            borderColor: "rgba(75, 192, 192, 1)",
+            borderWidth: 1,
+            fill: false,
+          },
+        ],
+      };
+
+      let ctx = document.getElementById("historyChart").getContext("2d");
+      let historyChart = new Chart(ctx, {
+        type: "line",
+        data: historyData,
+        options: {
+          scales: {
+            yAxes: [
+              {
+                ticks: {
+                  beginAtZero: true,
+                },
+              },
+            ],
+          },
+        },
+      });
+
+      function fetchSensorData() {
+        fetch("/sensor-data")
+          .then((response) => response.json())
+          .then((data) => {
+            if (data && data.distance !== undefined) {
+              let distance = data.distance;
+              let percentage = Math.min(Math.max(distance, 0), 100);
+
+              document.getElementById(
+                "tankProgress"
+              ).style.height = `${percentage}%`;
+              document.getElementById(
+                "tankPercentage"
+              ).innerText = `${percentage}%`;
+              document.getElementById(
+                "distance"
+              ).innerText = `Tank is filled up for: ${percentage}%`;
+
+              let now = new Date();
+              let timeString =
+                now.getHours() +
+                ":" +
+                now.getMinutes() +
+                ":" +
+                now.getSeconds();
+              historyData.labels.push(timeString);
+              historyData.datasets[0].data.push(distance);
+
+              if (historyData.labels.length > 10) {
+                historyData.labels.shift();
+                historyData.datasets[0].data.shift();
+              }
+
+              historyChart.update();
+              document.getElementById(
+                "lastUpdated"
+              ).innerText = `Last updated ${now.getMinutes()} mins ago`;
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching sensor data:", error);
+          });
+      }
+
+      setInterval(fetchSensorData, 5000); // Poll every 5 seconds
     </script>
   </body>
 </html>

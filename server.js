@@ -1,18 +1,25 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+const path = require('path');
+
 const app = express();
-const PORT = 3000;
+const port = 3000;
 
-// Serve static files (HTML, CSS, JS)
-app.use(express.static('web'));
+let latestSensorData = null;
 
-// Endpoint to simulate distance sensor data
-app.get('/endpoint', (req, res) => {
-    const distance = Math.floor(Math.random() * 30); // Simulate distance in cm
-    res.json({ distance });
+app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.post('/endpoint', (req, res) => {
+    latestSensorData = req.body;
+    console.log('Received data from Arduino:', latestSensorData);
+    res.status(200).send({ message: 'Data received successfully' });
 });
 
+app.get('/sensor-data', (req, res) => {
+    res.status(200).send(latestSensorData);
+});
 
-
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
 });
