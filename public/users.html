@@ -21,34 +21,66 @@
         padding: 20px;
         border-radius: 8px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        width: 300px;
-        max-height: 400px;
-        overflow-y: auto;
+        width: 80%;
+        max-width: 800px;
       }
       .container h1 {
         margin-bottom: 20px;
+        text-align: center;
       }
-      .user-item {
-        border-bottom: 1px solid #ccc;
-        padding: 10px 0;
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      table,
+      th,
+      td {
+        border: 1px solid #ddd;
+      }
+      th,
+      td {
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
       }
     </style>
   </head>
   <body>
-    <div class="container" id="usersList">
+    <div class="container">
       <h1>Saved Users</h1>
+      <table id="usersTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Age</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- User rows will be inserted here -->
+        </tbody>
+      </table>
     </div>
     <script>
       function fetchUsers() {
         fetch("/getUsers")
           .then((response) => response.json())
           .then((users) => {
-            const usersList = document.getElementById("usersList");
+            const usersTableBody = document.querySelector("#usersTable tbody");
+            usersTableBody.innerHTML = ""; // Clear the table body
             users.forEach((user) => {
-              const userItem = document.createElement("div");
-              userItem.className = "user-item";
-              userItem.textContent = `Name: ${user.name}, Email: ${user.email}, Age: ${user.age}`;
-              usersList.appendChild(userItem);
+              const row = document.createElement("tr");
+              row.innerHTML = `
+                            <td>${user.name}</td>
+                            <td>${user.email}</td>
+                            <td>${user.age}</td>
+                        `;
+              usersTableBody.appendChild(row);
             });
           })
           .catch((error) => {
