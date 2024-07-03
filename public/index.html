@@ -83,8 +83,8 @@
             <nav class="main-nav">
               <!-- ***** Logo Start ***** -->
               <a href="index.html" class="logo">
-                <!-- <img src="assets/logo/Logo_full.png" alt="Chain App Dev" height="90px"> -->
-                <div class="LOGO">LOGO</div>
+                <span class="LOGO" id="navbar-logo">LOGO</span>
+                <!-- <div class="LOGO" id="navbar-logo">LOGO</div> -->
               </a>
               <!-- ***** Logo End ***** -->
               <!-- ***** Menu Start ***** -->
@@ -93,12 +93,15 @@
                   <a href="#top" class="active">Home</a>
                 </li>
                 <li class="scroll-to-section">
-                  <a href="#services">services</a>
+                  <a href="#services">Services</a>
                 </li>
                 <li class="scroll-to-section"><a href="#about">About</a></li>
                 <li class="scroll-to-section"><a href="#faq">FAQ</a></li>
                 <li class="scroll-to-section">
                   <a href="#contact">Contact</a>
+                </li>
+                <li class="scroll-to-section">
+                  <span id="navbar-username">Guest</span>
                 </li>
               </ul>
               <a class="menu-trigger">
@@ -526,6 +529,29 @@
       });
     </script>
 
+    <!-- NAVBAR -->
+    <!-- <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        fetch("/api/user")
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("navbar-username").textContent =
+              data.username;
+          });
+      });
+    </script> -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        fetch("/api/user")
+          .then((response) => response.json())
+          .then((data) => {
+            const username = data.username;
+            document.getElementById("navbar-username").textContent = username;
+            document.getElementById("navbar-logo").textContent =
+              username !== "Guest" ? username : "LOGO";
+          });
+      });
+    </script>
     <!-- MAIN CODE -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
