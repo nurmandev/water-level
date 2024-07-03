@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Saved Users</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background-color: #f4f4f4;
+      }
+      .container {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+      .container h1 {
+        margin-bottom: 20px;
+      }
+      .user-item {
+        border-bottom: 1px solid #ccc;
+        padding: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" id="usersList">
+      <h1>Saved Users</h1>
+    </div>
+    <script>
+      function fetchUsers() {
+        fetch("/getUsers")
+          .then((response) => response.json())
+          .then((users) => {
+            const usersList = document.getElementById("usersList");
+            users.forEach((user) => {
+              const userItem = document.createElement("div");
+              userItem.className = "user-item";
+              userItem.textContent = `Name: ${user.name}, Email: ${user.email}, Age: ${user.age}`;
+              usersList.appendChild(userItem);
+            });
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+
+      // Fetch users on page load
+      fetchUsers();
+    </script>
+  </body>
+</html>
