@@ -17,7 +17,7 @@
 
     <link rel="icon" href="/assets/logo/Logo_head.png" type="image/png" />
 
-    <title>Login / Register</title>
+    <title>Login</title>
 
     <!-- Bootstrap core CSS -->
     <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
@@ -82,7 +82,7 @@
             <nav class="main-nav">
               <!-- ***** Logo Start ***** -->
               <a href="index.html" class="logo">
-                <div id="navbar-logo" class="LOGO">LOGO</div>
+                <div id="navbar-logo" class="LOGO"></div>
               </a>
               <!-- ***** Logo End ***** -->
               <!-- ***** Menu Start ***** -->
@@ -91,9 +91,11 @@
                   <a href="#top" class="active">Home</a>
                 </li>
                 <li class="scroll-to-section">
-                  <a href="#services">Services</a>
+                  <a href="./login.html">Login</a>
                 </li>
-                <li class="scroll-to-section"><a href="#about">About</a></li>
+                <li class="scroll-to-section">
+                  <a href="./register.html">Register</a>
+                </li>
                 <li class="scroll-to-section"><a href="#faq">FAQ</a></li>
                 <li class="scroll-to-section">
                   <a href="#contact">Contact</a>
@@ -156,80 +158,6 @@
 
                     <div>
                       <button type="submit" class="formbold-btn">Login</button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!--  REGISTER -->
-      <div id="Register" class="pricing-tables">
-        <div class="container">
-          <div class="row">
-            <div class="col-lg-8 offset-lg-2">
-              <div class="section-heading">
-                <h4>Register</h4>
-                <img src="assets/images/heading-line-dec.png" alt="" />
-                <p>Register</p>
-              </div>
-            </div>
-            <div class="col-lg-6 offset-lg-3">
-              <div class="formbold-main-wrapper">
-                <!-- Author: FormBold Team -->
-                <!-- Learn More: https://formbold.com -->
-                <div class="formbold-form-wrapper">
-                  <form action="/register" method="POST">
-                    <div class="formbold-mb-5">
-                      <label
-                        for="register-username"
-                        class="formbold-form-label"
-                      >
-                        Username:
-                      </label>
-                      <input
-                        type="text"
-                        id="register-username"
-                        name="username"
-                        required
-                        class="formbold-form-input"
-                      />
-                    </div>
-
-                    <div class="formbold-mb-5">
-                      <label for="register-email" class="formbold-form-label">
-                        Email:
-                      </label>
-                      <input
-                        type="email"
-                        id="register-email"
-                        name="email"
-                        required
-                        class="formbold-form-input"
-                      />
-                    </div>
-                    <div class="formbold-mb-5">
-                      <label
-                        for="register-password"
-                        class="formbold-form-label"
-                      >
-                        Password:
-                      </label>
-                      <input
-                        type="password"
-                        id="register-password"
-                        name="password"
-                        required
-                        class="formbold-form-input"
-                      />
-                    </div>
-
-                    <div>
-                      <button type="submit" class="formbold-btn">
-                        Register
-                      </button>
                     </div>
                   </form>
                 </div>
@@ -350,9 +278,11 @@
           .then((response) => response.json())
           .then((data) => {
             const username = data.username;
-            document.getElementById("navbar-username").textContent = username;
+            document.getElementById(
+              "navbar-username"
+            ).textContent = `welcome ${username}`;
             document.getElementById("navbar-logo").textContent =
-              username !== "Guest" ? username : "LOGO";
+              username !== "Guest" ? username : " ";
           });
       });
     </script>

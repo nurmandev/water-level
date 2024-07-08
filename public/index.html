@@ -83,7 +83,7 @@
             <nav class="main-nav">
               <!-- ***** Logo Start ***** -->
               <a href="index.html" class="logo">
-                <span class="LOGO" id="navbar-logo">LOGO</span>
+                <span class="LOGO" id="navbar-logo"></span>
                 <!-- <div class="LOGO" id="navbar-logo">LOGO</div> -->
               </a>
               <!-- ***** Logo End ***** -->
@@ -93,9 +93,11 @@
                   <a href="#top" class="active">Home</a>
                 </li>
                 <li class="scroll-to-section">
-                  <a href="#services">Services</a>
+                  <a href="./login.html">Login</a>
                 </li>
-                <li class="scroll-to-section"><a href="#about">About</a></li>
+                <li class="scroll-to-section">
+                  <a href="./register.html">Register</a>
+                </li>
                 <li class="scroll-to-section"><a href="#faq">FAQ</a></li>
                 <li class="scroll-to-section">
                   <a href="#contact">Contact</a>
@@ -123,7 +125,7 @@
               data-wow-duration="1s"
               data-wow-delay="0.5s"
             >
-              <h2>Working <em>Tools</em></h2>
+              <h2>Water <em>Level</em></h2>
               <img src="assets/images/heading-line-dec.png" alt="" />
               <p>
                 Water tank overflow is a common problem which leads to the
@@ -137,11 +139,6 @@
       </div>
     </div>
 
-    <div class="container">
-      <div class="card-deck">
-        <button>Users</button>
-      </div>
-    </div>
     <div class="container">
       <div class="card-deck">
         <div class="card">
@@ -546,9 +543,11 @@
           .then((response) => response.json())
           .then((data) => {
             const username = data.username;
-            document.getElementById("navbar-username").textContent = username;
+            document.getElementById(
+              "navbar-username"
+            ).textContent = `welcome ${username}`;
             document.getElementById("navbar-logo").textContent =
-              username !== "Guest" ? username : "LOGO";
+              username !== "Guest" ? username : " ";
           });
       });
     </script>

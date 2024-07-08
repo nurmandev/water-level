@@ -82,7 +82,8 @@
             <nav class="main-nav">
               <!-- ***** Logo Start ***** -->
               <a href="index.html" class="logo">
-                <div class="LOGO">LOGO</div>
+                <span class="LOGO" id="navbar-logo"></span>
+                <!-- <div class="LOGO" id="navbar-logo">LOGO</div> -->
               </a>
               <!-- ***** Logo End ***** -->
               <!-- ***** Menu Start ***** -->
@@ -91,9 +92,11 @@
                   <a href="#top" class="active">Home</a>
                 </li>
                 <li class="scroll-to-section">
-                  <a href="#services">Services</a>
+                  <a href="./login.html">Login</a>
                 </li>
-                <li class="scroll-to-section"><a href="#about">About</a></li>
+                <li class="scroll-to-section">
+                  <a href="./register.html">Register</a>
+                </li>
                 <li class="scroll-to-section"><a href="#faq">FAQ</a></li>
                 <li class="scroll-to-section">
                   <a href="#contact">Contact</a>
@@ -115,6 +118,48 @@
       <div class="container">
         <h1>Dashboard</h1>
         <p>Welcome to your dashboard.</p>
+      </div>
+
+      <div class="container">
+        <div class="card-deck">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Tank</h5>
+              <div class="progress progress-bar-vertical">
+                <div
+                  class="progress-bar progress-bar-danger bg-info progress-bar-striped progress-bar-animated"
+                  role="progressbar"
+                  aria-valuenow="0"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  id="tankProgress"
+                  style="height: 0%"
+                >
+                  <div class="container">
+                    <span class="sr-only" id="tankPercentage">0%</span>
+                  </div>
+                </div>
+              </div>
+              <div class="container">
+                <p id="distance">Tank is filled up for: 0%</p>
+              </div>
+              <div class="card-footer container">
+                <small class="text-muted" id="status"
+                  >Status: Monitoring...</small
+                >
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">History</h5>
+              <canvas id="historyChart"></canvas>
+            </div>
+            <div class="card-footer">
+              <small class="text-muted">Last updated # mins ago</small>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
 
@@ -143,8 +188,12 @@
         fetch("/api/user")
           .then((response) => response.json())
           .then((data) => {
-            document.getElementById("navbar-username").textContent =
-              data.username;
+            const username = data.username;
+            document.getElementById(
+              "navbar-username"
+            ).textContent = `welcome ${username}`;
+            document.getElementById("navbar-logo").textContent =
+              username !== "Guest" ? username : " ";
           });
       });
     </script>

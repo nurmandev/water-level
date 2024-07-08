@@ -48,7 +48,7 @@ app.get("/sensor-data", (req, res) => {
   res.status(200).send(latestSensorData);
 });
 
-app.post('/register', async (req, res) => {
+app.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -56,11 +56,14 @@ app.post('/register', async (req, res) => {
   await user.save();
 
   req.session.user = user;
-  res.redirect('/dashboard');
+  res.redirect("/dashboard");
 });
 
 app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "login.html"));
+});
+app.get("/register", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "register.html"));
 });
 
 app.post("/login", async (req, res) => {
@@ -69,9 +72,9 @@ app.post("/login", async (req, res) => {
 
   if (user && (await bcrypt.compare(password, user.password))) {
     req.session.user = user;
-    res.redirect("/");
+    res.redirect("/dashboard.html");
   } else {
-    res.redirect("/");
+    res.redirect("/login.html");
   }
 });
 
@@ -83,58 +86,16 @@ app.get("/dashboard", (req, res) => {
   }
 });
 
-app.get('/api/user', (req, res) => {
+app.get("/api/user", (req, res) => {
   if (req.session.user) {
-    res.json({ 
+    res.json({
       username: req.session.user.username,
-      email: req.session.user.email
+      email: req.session.user.email,
     });
   } else {
-    res.json({ username: 'Guest', email: '' });
+    res.json({ username: "Guest", email: " " });
   }
 });
-
-// app.get('/user', (req, res) => {
-//   res.sendFile(path.join(__dirname, 'public', 'user.html'));
-// });
-
-// app.post('/saveUser', (req, res) => {
-//   const user = req.body;
-
-//   fs.readFile('users.json', 'utf8', (err, data) => {
-//     if (err && err.code !== 'ENOENT') {
-//       console.error('Error reading file:', err);
-//       return res.status(500).send('Internal Server Error');
-//     }
-
-//     const users = data ? JSON.parse(data) : [];
-//     users.push(user);
-
-//     fs.writeFile('users.json', JSON.stringify(users, null, 2), (err) => {
-//       if (err) {
-//         console.error('Error writing file:', err);
-//         return res.status(500).send('Internal Server Error');
-//       }
-//       res.send('User data saved successfully!');
-//     });
-//   });
-// });
-
-// app.get('/getUsers', (req, res) => {
-//   fs.readFile('users.json', 'utf8', (err, data) => {
-//     if (err && err.code !== 'ENOENT') {
-//       console.error('Error reading file:', err);
-//       return res.status(500).send('Internal Server Error');
-//     }
-
-//     const users = data ? JSON.parse(data) : [];
-//     res.status(200).json(users);
-//   });
-// });
-
-// app.get('/users', (req, res) => {
-//   res.sendFile(path.join(__dirname, 'public', 'users.html'));
-// });
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
