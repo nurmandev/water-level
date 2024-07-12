@@ -24,7 +24,9 @@ app.use(
 );
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI);
+mongoose.connect(
+  "mongodb+srv://resume:1234@cluster0.8114dlp.mongodb.net/water_level_db?retryWrites=true&w=majority&appName=Cluster0"
+);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -55,7 +57,7 @@ const transporter = nodemailer.createTransport({
 });
 function sendEmail(subject, text, to) {
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: "nigeria water level",
     to,
     subject,
     text,
