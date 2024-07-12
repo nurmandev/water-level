@@ -1,9 +1,12 @@
 const express = require("express");
+const fs = require("fs");
 const bodyParser = require("body-parser");
 const path = require("path");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const session = require("express-session");
+const nodemailer = require("nodemailer");
+require("dotenv").config();
 
 const app = express();
 const port = 3000;
@@ -44,9 +47,57 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 
-app.post("/endpoint", (req, res) => {
+// Nodemailer configuration
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+function sendEmail(subject, text, to) {
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to,
+    subject,
+    text,
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent: " + info.response);
+    }
+  });
+}
+
+app.post("/endpoint", async (req, res) => {
   latestSensorData = req.body;
   console.log("Received data from Arduino:", latestSensorData);
+
+  if (req.body.distance <= 5) {
+    // Water is full (distance is low)
+    const users = await User.find({});
+    users.forEach((user) => {
+      sendEmail(
+        "Water Tank Alert",
+        `Dear ${user.username}, water tank is full.`,
+        user.email
+      );
+    });
+  } else if (req.body.distance >= 50) {
+    // Water is low (distance is high)
+    const users = await User.find({});
+    users.forEach((user) => {
+      sendEmail(
+        "Water Tank Alert",
+        `Dear ${user.username}, water tank is low.`,
+        user.email
+      );
+    });
+  }
+
   res.status(200).send({ message: "Data received successfully" });
 });
 
@@ -133,6 +184,41 @@ app.get("/logout", (req, res) => {
     }
     res.redirect("/login");
   });
+});
+
+// Test route
+app.get("/test-water-level", async (req, res) => {
+  const testData = {
+    sensor: "ultrasonic",
+    distance: req.query.distance || 10, // Default distance is 10cm
+  };
+
+  latestSensorData = testData;
+  console.log("Test data:", testData);
+
+  if (testData.distance <= 5) {
+    // Water is full (distance is low)
+    const users = await User.find({});
+    users.forEach((user) => {
+      sendEmail(
+        "Water Tank Alert",
+        `Dear ${user.username}, your water tank is full.`,
+        user.email
+      );
+    });
+  } else if (testData.distance >= 50) {
+    // Water is low (distance is high)
+    const users = await User.find({});
+    users.forEach((user) => {
+      sendEmail(
+        "Water Tank Alert",
+        `Dear ${user.username}, your water tank is low.`,
+        user.email
+      );
+    });
+  }
+
+  res.status(200).send({ message: "Test data processed successfully" });
 });
 
 app.listen(port, () => {
