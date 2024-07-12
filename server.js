@@ -57,7 +57,7 @@ const transporter = nodemailer.createTransport({
 });
 function sendEmail(subject, text, to) {
   const mailOptions = {
-    from: "nigeria water level",
+    from: "WATER LEVEL",
     to,
     subject,
     text,
