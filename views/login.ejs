@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include('partials/head'); %>
+  </head>
+  <body>
+    <%- include('navbar', { user: null }); %>
+    <main>
+      <div id="Login" class="pricing-tables">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+              <div class="section-heading">
+                <h4>Login</h4>
+                <img src="assets/images/heading-line-dec.png" alt="" />
+                <p>Login</p>
+              </div>
+            </div>
+            <div class="col-lg-6 offset-lg-3">
+              <div class="formbold-main-wrapper">
+                <!-- Author: FormBold Team -->
+                <!-- Learn More: https://formbold.com -->
+                <div class="formbold-form-wrapper">
+                  <form action="/login" method="POST">
+                    <div class="formbold-mb-5">
+                      <label for="login-username" class="formbold-form-label">
+                        Username:
+                      </label>
+                      <input
+                        type="text"
+                        id="login-username"
+                        name="username"
+                        required
+                        class="formbold-form-input"
+                      />
+                    </div>
+
+                    <div class="formbold-mb-5">
+                      <label for="login-password" class="formbold-form-label">
+                        Password:
+                      </label>
+                      <input
+                        type="password"
+                        id="login-password"
+                        name="password"
+                        required
+                        class="formbold-form-input"
+                      />
+                    </div>
+
+                    <div>
+                      <button type="submit" class="formbold-btn">Login</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <%- include('partials/footer'); %>
+  </body>
+</html>

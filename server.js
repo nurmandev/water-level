@@ -1,5 +1,4 @@
 const express = require("express");
-const fs = require("fs");
 const bodyParser = require("body-parser");
 const path = require("path");
 const mongoose = require("mongoose");
@@ -30,10 +29,17 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
+// Set EJS as the templating engine
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
 const userSchema = new mongoose.Schema({
   email: String,
   username: String,
   password: String,
+  age: String,
+  height: String,
+  weight: String,
 });
 
 const User = mongoose.model("User", userSchema);
@@ -48,22 +54,37 @@ app.get("/sensor-data", (req, res) => {
   res.status(200).send(latestSensorData);
 });
 
+app.get("/data", (req, res) => {
+  res.json(latestSensorData);
+});
+
 app.post("/register", async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, age, height, weight } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const user = new User({ username, email, password: hashedPassword });
+  const user = new User({
+    username,
+    email,
+    password: hashedPassword,
+    age,
+    height,
+    weight,
+  });
   await user.save();
 
   req.session.user = user;
   res.redirect("/dashboard");
 });
 
-app.get("/login", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "login.html"));
+app.get("/", (req, res) => {
+  res.render("index");
 });
+app.get("/login", (req, res) => {
+  res.render("login");
+});
+
 app.get("/register", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "register.html"));
+  res.render("register");
 });
 
 app.post("/login", async (req, res) => {
@@ -72,31 +93,48 @@ app.post("/login", async (req, res) => {
 
   if (user && (await bcrypt.compare(password, user.password))) {
     req.session.user = user;
-    res.redirect("/dashboard.html");
+    res.redirect("/dashboard");
   } else {
-    res.redirect("/login.html");
+    res.redirect("/login");
   }
 });
 
 app.get("/dashboard", (req, res) => {
   if (req.session.user) {
-    res.sendFile(path.join(__dirname, "public", "dashboard.html"));
+    res.render("dashboard", { user: req.session.user });
   } else {
-    res.redirect("/");
+    res.redirect("/login");
   }
 });
 
-app.get("/api/user", (req, res) => {
+app.get("/water", (req, res) => {
   if (req.session.user) {
-    res.json({
-      username: req.session.user.username,
-      email: req.session.user.email,
+    res.render("water", { user: req.session.user });
+  } else {
+    res.redirect("/login");
+  }
+});
+
+app.get("/sensor-data-page", (req, res) => {
+  if (req.session.user) {
+    res.render("sensor-data-page", {
+      user: req.session.user,
+      sensorData: latestSensorData,
     });
   } else {
-    res.json({ username: "Guest", email: " " });
+    res.redirect("/login");
   }
+});
+
+app.get("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.redirect("/dashboard");
+    }
+    res.redirect("/login");
+  });
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server running at http://localhost:${port}`);
 });

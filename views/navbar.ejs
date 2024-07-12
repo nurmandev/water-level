@@ -1,0 +1,51 @@
+<header
+  class="header-area header-sticky wow slideInDown"
+  data-wow-duration="0.75s"
+  data-wow-delay="0s"
+>
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <nav class="main-nav">
+          <!-- ***** Logo Start ***** -->
+          <a href="/" class="logo">
+            <span class="LOGO" id="navbar-logo"></span>
+          </a>
+          <!-- ***** Logo End ***** -->
+          <!-- ***** Menu Start ***** -->
+          <ul class="nav">
+            <li class="scroll-to-section">
+              <a href="/" class="active">Home</a>
+            </li>
+            <% if (user) { %>
+            <li class="scroll-to-section">
+              <form action="/logout" method="get" style="display: inline">
+                <button type="submit" class="logout-btn">Logout</button>
+              </form>
+            </li>
+            <li class="scroll-to-section">
+              <span id="navbar-username"><%= user.username %></span>
+            </li>
+            <% } else { %>
+            <li class="scroll-to-section">
+              <a href="/login">Login</a>
+            </li>
+            <li class="scroll-to-section">
+              <a href="/register">Register</a>
+            </li>
+
+            <li class="scroll-to-section"><a href="#faq">FAQ</a></li>
+            <li class="scroll-to-section">
+              <a href="#contact">Contact</a>
+            </li>
+            <% } %>
+          </ul>
+          <a class="menu-trigger">
+            <span>Menu</span>
+          </a>
+          <!-- ***** Menu End ***** -->
+        </nav>
+      </div>
+    </div>
+  </div>
+</header>
