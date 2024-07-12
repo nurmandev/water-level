@@ -188,7 +188,7 @@ app.get("/logout", (req, res) => {
 app.get("/test-water-level", async (req, res) => {
   const testData = {
     sensor: "ultrasonic",
-    distance: req.query.distance || 10, // Default distance is 10cm
+    distance: req.query.distance || 100, // Default distance is 10cm
   };
 
   latestSensorData = testData;
