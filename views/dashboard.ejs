@@ -98,18 +98,6 @@
           <td><%= user.weight %></td>
         </tr>
       </table>
-      <div id="sensor-data"></div>
-
-      <script>
-        fetch("/sensor-data")
-          .then((response) => response.json())
-          .then((data) => {
-            const sensorDataDiv = document.getElementById("sensor-data");
-            sensorDataDiv.innerHTML = `Latest Sensor Data: ${JSON.stringify(
-              data
-            )}`;
-          });
-      </script>
     </div>
 
     <div class="container">
@@ -130,23 +118,92 @@
       </table>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-      function fetchSensorData() {
-        fetch("/sensor-data")
+      const historyData = {
+        labels: [],
+        datasets: [
+          {
+            label: "Tank Fill Level (%)",
+            data: [],
+            backgroundColor: "rgba(54, 162, 235, 0.2)",
+            borderColor: "rgba(54, 162, 235, 1)",
+            borderWidth: 1,
+          },
+        ],
+      };
+
+      const historyChart = new Chart(
+        document.getElementById("historyChart").getContext("2d"),
+        {
+          type: "line",
+          data: historyData,
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 100,
+              },
+            },
+          },
+        }
+      );
+
+      function fetchData() {
+        fetch("http://localhost:3000/sensor-data")
           .then((response) => response.json())
           .then((data) => {
-            document.getElementById("sensor-type").innerText =
-              data.sensor || "-";
-            document.getElementById("sensor-distance").innerText =
-              data.distance !== undefined ? data.distance + " cm" : "-";
+            const distance = data.distance;
+            const fillPercentage = ((50 - distance) / 45) * 100; // Assuming 50 cm is empty and 5 cm is full
+
+            document.getElementById(
+              "tankProgress"
+            ).style.height = `${fillPercentage}%`;
+            document.getElementById(
+              "tankPercentage"
+            ).textContent = `${fillPercentage.toFixed(1)}%`;
+            document.getElementById(
+              "distance"
+            ).textContent = `Tank is filled up for: ${fillPercentage.toFixed(
+              1
+            )}%`;
+
+            if (distance <= 5) {
+              document.getElementById("status").textContent =
+                "Status: Water tank is full";
+            } else if (distance >= 50) {
+              document.getElementById("status").textContent =
+                "Status: Water tank is low";
+            } else {
+              document.getElementById("status").textContent =
+                "Status: Monitoring...";
+            }
+
+            // Update history chart
+            const now = new Date();
+            const timeLabel = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+            historyData.labels.push(timeLabel);
+            historyData.datasets[0].data.push(fillPercentage);
+
+            if (historyData.labels.length > 10) {
+              historyData.labels.shift();
+              historyData.datasets[0].data.shift();
+            }
+
+            historyChart.update();
+
+            // Update last updated time
+            const lastUpdatedElement = document.getElementById("lastUpdated");
+            lastUpdatedElement.textContent = `${Math.floor(
+              (Date.now() - historyChart.lastUpdate) / 60000
+            )}`;
+            historyChart.lastUpdate = Date.now();
           })
-          .catch((error) =>
-            console.error("Error fetching sensor data:", error)
-          );
+          .catch((error) => console.error("Error fetching data:", error));
       }
 
-      setInterval(fetchSensorData, 5000); // Fetch data every 5 seconds
-      fetchSensorData(); // Initial fetch
+      setInterval(fetchData, 5000); // Fetch data every 5 seconds
+      historyChart.lastUpdate = Date.now();
     </script>
     <%- include('partials/footer'); %>
   </body>

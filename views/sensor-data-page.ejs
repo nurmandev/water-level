@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Real-Time Water Level Logs</title>
+    <link rel="stylesheet" href="logs.css" />
+    <%- include('partials/head'); %>
+  </head>
+  <body>
+    <%- include('navbar', { user: user }); %>
+
+    <header>
+      <h1>Real-Time Water Level Logs</h1>
+    </header>
+    <main>
+      <section>
+        <h2>Logs</h2>
+        <table id="logTable">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Distance (cm)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+    </main>
+  </body>
+</html>

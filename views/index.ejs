@@ -71,6 +71,28 @@
       </div>
     </div>
 
+    <div class="container">
+      <h1>Real-Time Water Level Monitor</h1>
+      <p>
+        Current Water Level: <span id="waterLevel"><%= waterLevel %></span> cm
+      </p>
+    </div>
+
+    <script>
+      function fetchWaterLevel() {
+        fetch("/water-level")
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("waterLevel").innerText = data.waterLevel;
+          })
+          .catch((error) =>
+            console.error("Error fetching water level:", error)
+          );
+      }
+
+      setInterval(fetchWaterLevel, 5000); // Fetch water level every 5 seconds
+    </script>
+
     <div id="about" class="services section">
       <div class="container">
         <div class="row">
@@ -313,10 +335,6 @@
 
     <%- include('partials/footer'); %>
 
-   
-
-   
-   
     <!-- MAIN CODE -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
