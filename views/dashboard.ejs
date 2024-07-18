@@ -150,7 +150,7 @@
       );
 
       function fetchData() {
-        fetch("http://localhost:3000/sensor-data")
+        fetch("/sensor-data")
           .then((response) => response.json())
           .then((data) => {
             const distance = data.distance;
