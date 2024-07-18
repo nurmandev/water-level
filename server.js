@@ -1,10 +1,10 @@
 const express = require("express");
-const fs = require("fs");
 const bodyParser = require("body-parser");
 const path = require("path");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
@@ -15,22 +15,31 @@ let latestSensorData = null;
 let waterLevel = 0;
 
 // Middleware
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, "public")));
+
+// Use a production-ready session store
 app.use(
   session({
     secret: "proficient",
     resave: false,
     saveUninitialized: true,
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
   })
 );
-app.use(express.static(path.join(__dirname, "public")));
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose
+  .connect(
+    "mongodb+srv://resume:1234@cluster0.8114dlp.mongodb.net/water-db?retryWrites=true&w=majority&appName=Cluster0",
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  )
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error("Failed to connect to MongoDB", err));
 
 // Set EJS as the templating engine
 app.set("view engine", "ejs");
@@ -111,7 +120,6 @@ app.get("/test-water-level", async (req, res) => {
 app.post("/endpoint", (req, res) => {
   if (req.body.distance !== undefined) {
     waterLevel = req.body.distance;
-    latestSensorData = req.body;
     res.status(200).send("Water level updated");
   } else {
     res.status(400).send("Bad Request");
