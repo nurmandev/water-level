@@ -12,12 +12,10 @@ const app = express();
 const port = 3000;
 
 let latestSensorData = null;
-
 let waterLevel = 0;
 
-let clients = [];
-
 // Middleware
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
   session({
@@ -26,13 +24,13 @@ app.use(
     saveUninitialized: true,
   })
 );
+app.use(express.static(path.join(__dirname, "public")));
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI);
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 // Set EJS as the templating engine
 app.set("view engine", "ejs");
@@ -57,6 +55,7 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS,
   },
 });
+
 function sendEmail(subject, text, to) {
   const mailOptions = {
     from: "WATER LEVEL",
@@ -78,7 +77,7 @@ function sendEmail(subject, text, to) {
 app.get("/test-water-level", async (req, res) => {
   const testData = {
     sensor: "ultrasonic",
-    distance: req.query.distance || 100, // Default distance is 10cm
+    distance: req.query.distance || 100, // Default distance is 100cm
   };
 
   latestSensorData = testData;
@@ -112,47 +111,21 @@ app.get("/test-water-level", async (req, res) => {
 app.post("/endpoint", (req, res) => {
   if (req.body.distance !== undefined) {
     waterLevel = req.body.distance;
+    latestSensorData = req.body;
     res.status(200).send("Water level updated");
   } else {
     res.status(400).send("Bad Request");
   }
 });
+
 app.get("/", (req, res) => {
   res.render("index", { waterLevel: waterLevel });
 });
-// ENDPOINTS======================================>ENDPOINTS===================>
-// app.post("/endpoint", async (req, res) => {
-//   latestSensorData = req.body;
-//   console.log("Received data from Arduino:", latestSensorData);
-
-//   if (req.body.distance <= 5) {
-//     // Water is full (distance is low)
-//     const users = await User.find({});
-//     users.forEach((user) => {
-//       sendEmail(
-//         "Water Tank Alert",
-//         `Dear ${user.username}, your water tank is low.`,
-//         user.email
-//       );
-//     });
-//   } else if (req.body.distance >= 50) {
-//     // Water is low (distance is high)
-//     const users = await User.find({});
-//     users.forEach((user) => {
-//       sendEmail(
-//         "Water Tank Alert",
-//         `Dear ${user.username}, water tank is full.`,
-//         user.email
-//       );
-//     });
-//   }
-
-//   res.status(200).send({ message: "Data received successfully" });
-// });
 
 app.get("/sensor-data", (req, res) => {
   res.status(200).send(latestSensorData);
 });
+
 app.get("/sensor", (req, res) => {
   res.render("sensor-data-page");
 });
@@ -179,9 +152,6 @@ app.post("/register", async (req, res) => {
   res.redirect("/dashboard");
 });
 
-app.get("/", (req, res) => {
-  res.render("index");
-});
 app.get("/login", (req, res) => {
   res.render("login");
 });
