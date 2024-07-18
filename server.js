@@ -25,7 +25,9 @@ app.use(
 );
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI);
+mongoose.connect(
+  "mongodb+srv://resume:1234@cluster0.8114dlp.mongodb.net/water-db?retryWrites=true&w=majority&appName=Cluster0"
+);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -108,20 +110,22 @@ app.get("/test-water-level", async (req, res) => {
 
 // SSE endpoint
 app.get("/events", (req, res) => {
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
   res.flushHeaders(); // flush the headers to establish SSE with the client
 
   clients.push(res);
 
-  req.on('close', () => {
-    clients = clients.filter(client => client !== res);
+  req.on("close", () => {
+    clients = clients.filter((client) => client !== res);
   });
 });
 
 function sendEvent(data) {
-  clients.forEach(client => client.write(`data: ${JSON.stringify(data)}\n\n`));
+  clients.forEach((client) =>
+    client.write(`data: ${JSON.stringify(data)}\n\n`)
+  );
 }
 
 // ENDPOINTS======================================>ENDPOINTS===================>
@@ -241,8 +245,6 @@ app.get("/logout", (req, res) => {
     res.redirect("/login");
   });
 });
-
-
 
 app.get("/api/user", (req, res) => {
   if (req.session.user) {
