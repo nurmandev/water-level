@@ -128,6 +128,27 @@ function sendEvent(data) {
   );
 }
 
+// Dummy endpoint for testing with random distance values
+// app.post("/endpoint", async (req, res) => {
+//   // Generate a random distance value between 0 and 100
+//   const randomDistance = Math.random() * 100;
+//   latestSensorData = { distance: randomDistance };
+//   console.log("Generated random distance:", randomDistance);
+
+//   // Dummy logic for testing purposes
+//   if (randomDistance <= 5) {
+//     console.log("Water is full (distance is low)");
+//   } else if (randomDistance >= 50) {
+//     console.log("Water is low (distance is high)");
+//   } else {
+//     console.log("Water level is normal");
+//   }
+
+//   res
+//     .status(200)
+//     .send({ message: "Data received successfully", data: latestSensorData });
+// });
+
 // ENDPOINTS======================================>ENDPOINTS===================>
 app.post("/endpoint", async (req, res) => {
   latestSensorData = req.body;
@@ -161,6 +182,7 @@ app.post("/endpoint", async (req, res) => {
 app.get("/sensor-data", (req, res) => {
   res.status(200).send(latestSensorData);
 });
+
 app.get("/sensor", (req, res) => {
   res.render("sensor-data-page");
 });
@@ -190,6 +212,7 @@ app.post("/register", async (req, res) => {
 app.get("/", (req, res) => {
   res.render("index");
 });
+
 app.get("/login", (req, res) => {
   res.render("login");
 });

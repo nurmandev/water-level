@@ -2,6 +2,7 @@
 <html>
   <head>
     <%- include('partials/head'); %>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
   </head>
   <body>
     <%- include('navbar', { user: user }); %>
@@ -67,9 +68,7 @@
               <canvas id="historyChart"></canvas>
             </div>
             <div class="card-footer">
-              <small class="text-muted" id="lastUpdated"
-                >Last updated 0 mins ago</small
-              >
+              <small class="text-muted">Last updated # mins ago</small>
             </div>
           </div>
         </div>
@@ -120,95 +119,73 @@
       </table>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+      const tankProgress = document.getElementById("tankProgress");
+      const tankPercentage = document.getElementById("tankPercentage");
+      const distanceElement = document.getElementById("distance");
+      const statusElement = document.getElementById("status");
+      const historyChartElement = document.getElementById("historyChart");
+
       const historyData = {
         labels: [],
         datasets: [
           {
-            label: "Tank Fill Level (%)",
+            label: "Water Level (%)",
             data: [],
-            backgroundColor: "rgba(54, 162, 235, 0.2)",
-            borderColor: "rgba(54, 162, 235, 1)",
+            borderColor: "rgba(75, 192, 192, 1)",
+            backgroundColor: "rgba(75, 192, 192, 0.2)",
             borderWidth: 1,
           },
         ],
       };
 
-      const historyChart = new Chart(
-        document.getElementById("historyChart").getContext("2d"),
-        {
-          type: "line",
-          data: historyData,
-          options: {
-            scales: {
-              y: {
-                beginAtZero: true,
-                max: 100,
-              },
+      const historyChart = new Chart(historyChartElement, {
+        type: "line",
+        data: historyData,
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
             },
           },
-        }
-      );
+        },
+      });
 
-      function fetchData() {
-        fetch("/sensor-data")
-          .then((response) => response.json())
-          .then((data) => {
-            if (data) {
-              const distance = data.distance;
-              const fillPercentage = ((50 - distance) / 45) * 100; // Assuming 50 cm is empty and 5 cm is full
+      function updateTankData(data) {
+        const percentage = ((50 - data.distance) / 50) * 100;
+        tankProgress.style.height = `${percentage}%`;
+        tankProgress.setAttribute("aria-valuenow", percentage);
+        tankPercentage.innerText = `${percentage.toFixed(2)}%`;
+        distanceElement.innerText = `Tank is filled up for: ${percentage.toFixed(
+          2
+        )}%`;
+        statusElement.innerText = `Status: Monitoring...`;
 
-              document.getElementById(
-                "tankProgress"
-              ).style.height = `${fillPercentage}%`;
-              document.getElementById(
-                "tankPercentage"
-              ).textContent = `${fillPercentage.toFixed(1)}%`;
-              document.getElementById(
-                "distance"
-              ).textContent = `Tank is filled up for: ${fillPercentage.toFixed(
-                1
-              )}%`;
-
-              if (distance <= 5) {
-                document.getElementById("status").textContent =
-                  "Status: Water tank is full";
-              } else if (distance >= 50) {
-                document.getElementById("status").textContent =
-                  "Status: Water tank is low";
-              } else {
-                document.getElementById("status").textContent =
-                  "Status: Monitoring...";
-              }
-
-              // Update history chart
-              const now = new Date();
-              const timeLabel = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
-              historyData.labels.push(timeLabel);
-              historyData.datasets[0].data.push(fillPercentage);
-
-              if (historyData.labels.length > 10) {
-                historyData.labels.shift();
-                historyData.datasets[0].data.shift();
-              }
-
-              historyChart.update();
-
-              // Update last updated time
-              const lastUpdatedElement = document.getElementById("lastUpdated");
-              lastUpdatedElement.textContent = `${Math.floor(
-                (Date.now() - historyChart.lastUpdate) / 60000
-              )} mins ago`;
-              historyChart.lastUpdate = Date.now();
-            }
-          })
-          .catch((error) => console.error("Error fetching data:", error));
+        const now = new Date();
+        const timeLabel = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+        historyData.labels.push(timeLabel);
+        historyData.datasets[0].data.push(percentage);
+        historyChart.update();
       }
 
-      setInterval(fetchData, 5000); // Fetch data every 5 seconds
-      historyChart.lastUpdate = Date.now();
+      async function fetchSensorData() {
+        try {
+          const response = await fetch("/sensor-data");
+          const data = await response.json();
+          updateTankData(data);
+        } catch (error) {
+          console.error("Error fetching sensor data:", error);
+        }
+      }
+
+      async function startMonitoring() {
+        await fetchSensorData();
+        setInterval(fetchSensorData, 60000);
+      }
+
+      startMonitoring();
     </script>
-    <%- include('partials/footer'); %>
+    <%- include('partials/footer'); %> <%- include('partials/footerSec'); %>
   </body>
 </html>

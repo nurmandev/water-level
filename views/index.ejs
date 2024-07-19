@@ -71,41 +71,6 @@
       </div>
     </div>
 
-    <script>
-      function fetchWaterLevel() {
-        fetch("/water-level")
-          .then((response) => response.json())
-          .then((data) => {
-            const waterLevel = data.waterLevel;
-            const tankProgress = document.getElementById("tankProgress");
-            const tankPercentage = document.getElementById("tankPercentage");
-            const distance = document.getElementById("distance");
-            const status = document.getElementById("status");
-
-            const percentage = Math.min(
-              Math.max((waterLevel / 100) * 100, 0),
-              100
-            );
-
-            tankProgress.style.height = percentage + "%";
-            tankProgress.setAttribute("aria-valuenow", percentage);
-            tankPercentage.innerText = percentage.toFixed(2) + "%";
-            distance.innerText =
-              "Tank is filled up for: " + percentage.toFixed(2) + "%";
-            status.innerText = "Status: Monitoring...";
-          })
-          .catch((error) => {
-            console.error("Error fetching water level:", error);
-            document.getElementById("status").innerText =
-              "Status: Error fetching data";
-          });
-
-        setTimeout(fetchWaterLevel, 5000); // Fetch water level every 5 seconds
-      }
-
-      window.onload = fetchWaterLevel;
-    </script>
-
     <div id="about" class="services section">
       <div class="container">
         <div class="row">
@@ -346,86 +311,76 @@
       </div>
     </div>
 
-    <%- include('partials/footer'); %>
+    <%- include('partials/footer'); %> <%- include('partials/footerSec'); %>
 
     <!-- MAIN CODE -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script>
-      let historyData = {
+      const tankProgress = document.getElementById("tankProgress");
+      const tankPercentage = document.getElementById("tankPercentage");
+      const distanceElement = document.getElementById("distance");
+      const statusElement = document.getElementById("status");
+      const historyChartElement = document.getElementById("historyChart");
+
+      const historyData = {
         labels: [],
         datasets: [
           {
-            label: "Distance (cm)",
+            label: "Water Level (%)",
             data: [],
             borderColor: "rgba(75, 192, 192, 1)",
+            backgroundColor: "rgba(75, 192, 192, 0.2)",
             borderWidth: 1,
-            fill: false,
           },
         ],
       };
 
-      let ctx = document.getElementById("historyChart").getContext("2d");
-      let historyChart = new Chart(ctx, {
+      const historyChart = new Chart(historyChartElement, {
         type: "line",
         data: historyData,
         options: {
           scales: {
-            yAxes: [
-              {
-                ticks: {
-                  beginAtZero: true,
-                },
-              },
-            ],
+            y: {
+              beginAtZero: true,
+              max: 100,
+            },
           },
         },
       });
 
-      function fetchSensorData() {
-        fetch("/sensor-data")
-          .then((response) => response.json())
-          .then((data) => {
-            if (data && data.distance !== undefined) {
-              let distance = data.distance;
-              let percentage = Math.min(Math.max(distance, 0), 100);
+      function updateTankData(data) {
+        const percentage = ((50 - data.distance) / 50) * 100;
+        tankProgress.style.height = `${percentage}%`;
+        tankProgress.setAttribute("aria-valuenow", percentage);
+        tankPercentage.innerText = `${percentage.toFixed(2)}%`;
+        distanceElement.innerText = `Tank is filled up for: ${percentage.toFixed(
+          2
+        )}%`;
+        statusElement.innerText = `Status: Monitoring...`;
 
-              document.getElementById(
-                "tankProgress"
-              ).style.height = `${percentage}%`;
-              document.getElementById(
-                "tankPercentage"
-              ).innerText = `${percentage}%`;
-              document.getElementById(
-                "distance"
-              ).innerText = `Tank is filled up for: ${percentage}%`;
-
-              let now = new Date();
-              let timeString =
-                now.getHours() +
-                ":" +
-                now.getMinutes() +
-                ":" +
-                now.getSeconds();
-              historyData.labels.push(timeString);
-              historyData.datasets[0].data.push(distance);
-
-              if (historyData.labels.length > 10) {
-                historyData.labels.shift();
-                historyData.datasets[0].data.shift();
-              }
-
-              historyChart.update();
-              document.getElementById(
-                "lastUpdated"
-              ).innerText = `Last updated ${now.getMinutes()} mins ago`;
-            }
-          })
-          .catch((error) => {
-            console.error("Error fetching sensor data:", error);
-          });
+        const now = new Date();
+        const timeLabel = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+        historyData.labels.push(timeLabel);
+        historyData.datasets[0].data.push(percentage);
+        historyChart.update();
       }
 
-      setInterval(fetchSensorData, 5000); // Poll every 5 seconds
+      async function fetchSensorData() {
+        try {
+          const response = await fetch("/sensor-data");
+          const data = await response.json();
+          updateTankData(data);
+        } catch (error) {
+          console.error("Error fetching sensor data:", error);
+        }
+      }
+
+      async function startMonitoring() {
+        await fetchSensorData();
+        setInterval(fetchSensorData, 60000);
+      }
+
+      startMonitoring();
     </script>
   </body>
 </html>
