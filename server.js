@@ -131,32 +131,43 @@ app.get("/test-water-level", async (req, res) => {
 
 // ENDPOINTS======================================>ENDPOINTS===================>
 app.post("/endpoint", async (req, res) => {
-  latestSensorData = req.body;
-  console.log("Received data from Arduino:", latestSensorData);
+  try {
+    // Check if the request body has the necessary data
+    if (!req.body || typeof req.body.distance !== "number") {
+      return res.status(400).send({ message: "Invalid data format" });
+    }
 
-  if (req.body.distance <= 5) {
-    // Water is full (distance is low)
+    latestSensorData = req.body;
+    console.log("Received data from Arduino:", latestSensorData);
+
+    // Fetch all users from the database
     const users = await User.find({});
-    users.forEach((user) => {
-      sendEmail(
-        "Water Tank Alert",
-        `Dear ${user.username}, your water tank is low.`,
-        user.email
-      );
-    });
-  } else if (req.body.distance >= 50) {
-    // Water is low (distance is high)
-    const users = await User.find({});
-    users.forEach((user) => {
-      sendEmail(
-        "Water Tank Alert",
-        `Dear ${user.username}, water tank is full.`,
-        user.email
-      );
-    });
+
+    if (latestSensorData.distance <= 5) {
+      // Water is full (distance is low)
+      users.forEach((user) => {
+        sendEmail(
+          "Water Tank Alert",
+          `Dear ${user.username}, your water tank is full.`,
+          user.email
+        );
+      });
+    } else if (latestSensorData.distance >= 50) {
+      // Water is low (distance is high)
+      users.forEach((user) => {
+        sendEmail(
+          "Water Tank Alert",
+          `Dear ${user.username}, your water tank is low.`,
+          user.email
+        );
+      });
+    }
+
+    res.status(200).send({ message: "Data received successfully" });
+  } catch (error) {
+    console.error("Error processing data:", error);
+    res.status(500).send({ message: "Internal server error" });
   }
-
-  res.status(200).send({ message: "Data received successfully" });
 });
 
 app.get("/sensor-data", (req, res) => {
