@@ -67,14 +67,14 @@
       <table class="table table-bordered mt-4">
         <thead>
           <tr>
-            <th>Distance</th>
+            <th>Weight</th>
             <th>Status</th>
           </tr>
         </thead>
         <tbody>
           <% if (sensorData) { %>
           <tr>
-            <td><%= sensorData.distance %> cm</td>
+            <td><%= sensorData.distance %> kg</td>
             <td>Tank is filled up for <%= sensorData.distance %>%</td>
           </tr>
           <% } else { %>

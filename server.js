@@ -201,7 +201,7 @@ app.post("/register", async (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.render("index");
+  res.render("index", { sensorData: latestSensorData });
 });
 
 app.get("/login", (req, res) => {
@@ -226,7 +226,10 @@ app.post("/login", async (req, res) => {
 
 app.get("/dashboard", (req, res) => {
   if (req.session.user) {
-    res.render("dashboard", { user: req.session.user });
+    res.render("dashboard", {
+      user: req.session.user,
+      sensorData: latestSensorData,
+    });
   } else {
     res.redirect("/login");
   }
