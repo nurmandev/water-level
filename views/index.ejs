@@ -319,73 +319,46 @@
     <%- include('partials/footer'); %> <%- include('partials/footerSec'); %>
 
     <!-- MAIN CODE -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-      const tankProgress = document.getElementById("tankProgress");
-      const tankPercentage = document.getElementById("tankPercentage");
-      const distanceElement = document.getElementById("distance");
-      const statusElement = document.getElementById("status");
-      const historyChartElement = document.getElementById("historyChart");
-
-      const historyData = {
-        labels: [],
-        datasets: [
-          {
-            label: "Water Level (%)",
-            data: [],
-            borderColor: "rgba(75, 192, 192, 1)",
-            backgroundColor: "rgba(75, 192, 192, 0.2)",
-            borderWidth: 1,
-          },
-        ],
-      };
-
-      const historyChart = new Chart(historyChartElement, {
+      // Initialize chart
+      const ctx = document.getElementById("historyChart").getContext("2d");
+      const historyChart = new Chart(ctx, {
         type: "line",
-        data: historyData,
+        data: {
+          labels: [], // Add labels for history
+          datasets: [
+            {
+              label: "Water Level History",
+              data: [], // Add data for history
+              borderColor: "rgba(75, 192, 192, 1)",
+              borderWidth: 1,
+            },
+          ],
+        },
         options: {
           scales: {
             y: {
               beginAtZero: true,
-              max: 100,
             },
           },
         },
       });
 
-      function updateTankData(data) {
-        const percentage = ((50 - data.distance) / 50) * 100;
-        tankProgress.style.height = `${percentage}%`;
-        tankProgress.setAttribute("aria-valuenow", percentage);
-        tankPercentage.innerText = `${percentage.toFixed(2)}%`;
-        distanceElement.innerText = `Tank is filled up for: ${percentage.toFixed(
-          2
-        )}%`;
-        statusElement.innerText = `Status: Monitoring...`;
-
-        const now = new Date();
-        const timeLabel = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
-        historyData.labels.push(timeLabel);
-        historyData.datasets[0].data.push(percentage);
+      // Update chart data dynamically (if required)
+      function updateChartData(labels, data) {
+        historyChart.data.labels = labels;
+        historyChart.data.datasets[0].data = data;
         historyChart.update();
       }
 
-      async function fetchSensorData() {
-        try {
-          const response = await fetch("/sensor-data");
-          const data = await response.json();
-          updateTankData(data);
-        } catch (error) {
-          console.error("Error fetching sensor data:", error);
-        }
-      }
-
-      async function startMonitoring() {
-        await fetchSensorData();
-        setInterval(fetchSensorData, 60000);
-      }
-
-      startMonitoring();
+      // Dummy data for demonstration purposes
+      const labels = ["Time 1", "Time 2", "Time 3"];
+      const data = [10, 20, 30];
+      updateChartData(labels, data);
     </script>
   </body>
 </html>

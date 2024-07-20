@@ -133,9 +133,9 @@ app.get("/test-water-level", async (req, res) => {
 app.post("/endpoint", async (req, res) => {
   try {
     // Check if the request body has the necessary data
-    // if (!req.body || typeof req.body.distance !== "number") {
-    //   return res.status(400).send({ message: "Invalid data format" });
-    // }
+    if (!req.body || typeof req.body.distance !== "number") {
+      return res.status(400).send({ message: "Invalid data format, It's must be number not a string" });
+    }
 
     latestSensorData = req.body;
     console.log("Received data from Arduino:", latestSensorData);
