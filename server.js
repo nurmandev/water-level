@@ -133,9 +133,9 @@ app.get("/test-water-level", async (req, res) => {
 app.post("/endpoint", async (req, res) => {
   try {
     // Check if the request body has the necessary data
-    if (!req.body || typeof req.body.distance !== "number") {
-      return res.status(400).send({ message: "Invalid data format" });
-    }
+    // if (!req.body || typeof req.body.distance !== "number") {
+    //   return res.status(400).send({ message: "Invalid data format" });
+    // }
 
     latestSensorData = req.body;
     console.log("Received data from Arduino:", latestSensorData);
@@ -148,7 +148,7 @@ app.post("/endpoint", async (req, res) => {
       users.forEach((user) => {
         sendEmail(
           "Water Tank Alert",
-          `Dear ${user.username}, your water tank is full.`,
+          `Dear ${user.username}, your water tank is low.`,
           user.email
         );
       });
@@ -157,7 +157,7 @@ app.post("/endpoint", async (req, res) => {
       users.forEach((user) => {
         sendEmail(
           "Water Tank Alert",
-          `Dear ${user.username}, your water tank is low.`,
+          `Dear ${user.username},  your water tank is full.`,
           user.email
         );
       });
