@@ -108,26 +108,6 @@ app.get("/test-water-level", async (req, res) => {
   res.status(200).send({ message: "Test data processed successfully" });
 });
 
-// SSE endpoint
-app.get("/events", (req, res) => {
-  res.setHeader("Content-Type", "text/event-stream");
-  res.setHeader("Cache-Control", "no-cache");
-  res.setHeader("Connection", "keep-alive");
-  res.flushHeaders(); // flush the headers to establish SSE with the client
-
-  clients.push(res);
-
-  req.on("close", () => {
-    clients = clients.filter((client) => client !== res);
-  });
-});
-
-function sendEvent(data) {
-  clients.forEach((client) =>
-    client.write(`data: ${JSON.stringify(data)}\n\n`)
-  );
-}
-
 // Dummy endpoint for testing with random distance values
 // app.post("/endpoint", async (req, res) => {
 //   // Generate a random distance value between 0 and 100
@@ -227,7 +207,7 @@ app.post("/login", async (req, res) => {
 
   if (user && (await bcrypt.compare(password, user.password))) {
     req.session.user = user;
-    res.redirect("/dashboard");
+    res.redirect("/sensor-data-page");
   } else {
     res.redirect("/login");
   }
