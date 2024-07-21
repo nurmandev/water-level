@@ -130,45 +130,57 @@ app.get("/test-water-level", async (req, res) => {
 // });
 
 // ENDPOINTS======================================>ENDPOINTS===================>
-app.post("/endpoint", async (req, res) => {
-  try {
-    // Check if the request body has the necessary data
-    if (!req.body || typeof req.body.distance !== "number") {
-      return res.status(400).send({ message: "Invalid data format, It's must be number not a string" });
+  app.post("/endpoint", async (req, res) => {
+    try {
+      // Check if the request body has the necessary data
+      if (!req.body || typeof req.body.distance === "undefined") {
+        return res.status(400).send({ message: "Invalid data format, distance is required" });
+      }
+  
+      // Convert distance to a number if it's a string
+      let distance = req.body.distance;
+      if (typeof distance === "string") {
+        distance = parseFloat(distance);
+      }
+  
+      // Check if the distance is a valid number
+      if (isNaN(distance)) {
+        return res.status(400).send({ message: "Invalid data format, distance must be a number" });
+      }
+  
+      latestSensorData = { distance };
+      console.log("Received data from Arduino:", latestSensorData);
+  
+      // Fetch all users from the database
+      const users = await User.find({});
+  
+      if (distance <= 5) {
+        // Water is full (distance is low)
+        users.forEach((user) => {
+          sendEmail(
+            "Water Tank Alert",
+            `Dear ${user.username}, your water tank is low.`,
+            user.email
+          );
+        });
+      } else if (distance >= 50) {
+        // Water is low (distance is high)
+        users.forEach((user) => {
+          sendEmail(
+            "Water Tank Alert",
+            `Dear ${user.username}, your water tank is full.`,
+            user.email
+          );
+        });
+      }
+  
+      res.status(200).send({ message: "Data received successfully" });
+    } catch (error) {
+      console.error("Error processing data:", error);
+      res.status(500).send({ message: "Internal server error" });
     }
-
-    latestSensorData = req.body;
-    console.log("Received data from Arduino:", latestSensorData);
-
-    // Fetch all users from the database
-    const users = await User.find({});
-
-    if (latestSensorData.distance <= 5) {
-      // Water is full (distance is low)
-      users.forEach((user) => {
-        sendEmail(
-          "Water Tank Alert",
-          `Dear ${user.username}, your water tank is low.`,
-          user.email
-        );
-      });
-    } else if (latestSensorData.distance >= 50) {
-      // Water is low (distance is high)
-      users.forEach((user) => {
-        sendEmail(
-          "Water Tank Alert",
-          `Dear ${user.username},  your water tank is full.`,
-          user.email
-        );
-      });
-    }
-
-    res.status(200).send({ message: "Data received successfully" });
-  } catch (error) {
-    console.error("Error processing data:", error);
-    res.status(500).send({ message: "Internal server error" });
-  }
-});
+  });
+  
 
 app.get("/sensor-data", (req, res) => {
   res.status(200).send(latestSensorData);
