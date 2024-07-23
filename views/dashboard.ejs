@@ -21,22 +21,22 @@
                 <div
                   class="progress-bar progress-bar-danger bg-info progress-bar-striped progress-bar-animated"
                   role="progressbar"
-                  aria-valuenow="<%= sensorData ? sensorData.distance : 0 %>"
+                  aria-valuenow="<%= sensorData ? sensorData.weight : 0 %>"
                   aria-valuemin="0"
                   aria-valuemax="100"
                   id="tankProgress"
-                  style="height: <%= sensorData ? sensorData.distance : 0 %>%"
+                  style="height: <%= sensorData ? sensorData.weight : 0 %>%"
                 >
                   <div class="container">
                     <span class="sr-only" id="tankPercentage"
-                      ><%= sensorData ? sensorData.distance : 0 %>%</span
+                      ><%= sensorData ? sensorData.weight : 0 %>%</span
                     >
                   </div>
                 </div>
               </div>
               <div class="container">
-                <p id="distance">
-                  Tank is filled up for: <%= sensorData ? sensorData.distance :
+                <p id="weight">
+                  Tank is filled up for: <%= sensorData ? sensorData.weight :
                   0 %>%
                 </p>
               </div>
@@ -95,8 +95,8 @@
         <tbody>
           <% if (sensorData) { %>
           <tr>
-            <td><%= sensorData.distance %> kg</td>
-            <td>Tank is filled up for <%= sensorData.distance %>%</td>
+            <td><%= sensorData.weight %> kg</td>
+            <td>Tank is filled up for <%= sensorData.weight %>%</td>
           </tr>
           <% } else { %>
           <tr>
