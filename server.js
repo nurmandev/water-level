@@ -25,7 +25,7 @@ app.use(
 );
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI);
+mongoose.connect("mongodb+srv://resume:1234@cluster0.8114dlp.mongodb.net/water-db?retryWrites=true&w=majority&appName=Cluster0");
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -48,7 +48,7 @@ const User = mongoose.model("User", userSchema);
 
 // Nodemailer configuration
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  service: "smpt.gmail.com",
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -106,28 +106,7 @@ app.get("/test-water-level", async (req, res) => {
   res.status(200).send({ message: "Test data processed successfully" });
 });
 
-// Dummy endpoint for testing with random distance values
-// app.post("/endpoint", async (req, res) => {
-//   // Generate a random distance value between 0 and 100
-//   const randomDistance = Math.random() * 100;
-//   latestSensorData = { distance: randomDistance };
-//   console.log("Generated random distance:", randomDistance);
-
-//   // Dummy logic for testing purposes
-//   if (randomDistance <= 5) {
-//     console.log("Water is full (distance is low)");
-//   } else if (randomDistance >= 50) {
-//     console.log("Water is low (distance is high)");
-//   } else {
-//     console.log("Water level is normal");
-//   }
-
-//   res
-//     .status(200)
-//     .send({ message: "Data received successfully", data: latestSensorData });
-// });
-
-// ENDPOINTS======================================>ENDPOINTS===================>
+// ENDPOINTS==================================>ENDPOINTS<=======================ENDPOINTS
 app.post("/endpoint", async (req, res) => {
   try {
     // Check if the request body has the necessary data
