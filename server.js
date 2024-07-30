@@ -9,7 +9,7 @@ const nodemailer = require("nodemailer");
 require("dotenv").config();
 
 const app = express();
-const port = 3000;
+const port = 5000;
 
 let latestSensorData = null;
 let clients = [];
@@ -25,7 +25,9 @@ app.use(
 );
 
 // Connect to MongoDB
-mongoose.connect("mongodb+srv://resume:1234@cluster0.8114dlp.mongodb.net/water-db?retryWrites=true&w=majority&appName=Cluster0");
+mongoose.connect(
+  "mongodb+srv://resume:1234@cluster0.8114dlp.mongodb.net/water-db?retryWrites=true&w=majority&appName=Cluster0"
+);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
