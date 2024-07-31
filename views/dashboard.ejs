@@ -12,7 +12,7 @@
       </div>
 
       <div class="container mt-5">
-        <h1>Sensor Data for <%= user.username %></h1>
+        <h1>Sensor data for <%= user.username %></h1>
         <div class="card-deck">
           <div class="card">
             <div class="card-body">
@@ -61,7 +61,7 @@
     </main>
 
     <div class="container">
-      <h1><%= user.username %> This is your details</h1>
+      <h1><%= user.username %>, This is your details</h1>
       <table class="table table-bordered">
         <tr>
           <th>Username</th>
@@ -78,6 +78,10 @@
         <tr>
           <th>Height</th>
           <td><%= user.height %></td>
+        </tr>
+        <tr>
+          <th>Weight</th>
+          <td><%= user.weight %></td>
         </tr>
       </table>
 
